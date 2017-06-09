@@ -25,10 +25,15 @@ to move_crowd
 
     ask turtle_neighbors [
       if(not (pcolor = red))[
+       let overlap 0
+        if any? turtles-on myself
+        [
+          set overlap -10
+        ]
         let goal ((this_path_field - target-distance)/(sqrt(2)))
         let obstacle_repulsion ( - ( obstacle-value / 3 ) )
 
-        let utility ((obstacle_repulsion + goal))
+        let utility ((obstacle_repulsion + goal + overlap))
         let probability exp(utility)
         if(probability > val)[
           set val probability
@@ -630,7 +635,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.1
+NetLogo 6.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

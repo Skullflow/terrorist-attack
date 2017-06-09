@@ -1,9 +1,10 @@
-globals[ wall target room-floor obstacle-1 obstacle-2 obstacle-3 obstacle-4 obstacle-5 obstacle-6 obstacle-7 obstacle-8 obstacle-9 ]
+globals[ evacuated wall target room-floor obstacle-1 obstacle-2 obstacle-3 obstacle-4 obstacle-5 obstacle-6 obstacle-7 obstacle-8 obstacle-9 ]
 patches-own[ target-distance obstacle-value ]
 
 
 to set-up
   clear-all
+  set evacuated 0
   prepare-patch
   compute-distance
   compute-obstacle
@@ -13,6 +14,7 @@ end
 
 to go
   move_crowd
+
   tick
 end
 
@@ -33,7 +35,7 @@ to move_crowd
     ask turtle_neighbors [
       let direction 0
       if(self = patch_direction)[
-        set direction 100
+        set direction 0.2
       ]
       if(not (pcolor = red))[
         if not (any? turtles-on self)
@@ -42,7 +44,6 @@ to move_crowd
           let obstacle_repulsion ( - ( obstacle-value / 5 ) )
           let utility ((obstacle_repulsion + goal + direction))
           let probability exp(utility)
-          set plabel iprobability
           if(probability > val)[
             set val probability
             set moveto self
@@ -52,6 +53,8 @@ to move_crowd
       ]
     ]
     if(pcolor = blue)[
+      set evacuated (evacuated + 1)
+      print "ciao"
       die
     ]
     face moveto
@@ -286,7 +289,7 @@ n_crowd
 n_crowd
 1
 500
-5.0
+90.0
 1
 1
 NIL
@@ -299,7 +302,7 @@ BUTTON
 135
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -308,6 +311,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+55
+290
+255
+440
+plot 1
+Time
+N evacuated
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Evacuated" 1.0 0 -16777216 true "" "plot evacuated"
 
 @#$#@#$#@
 ## WHAT IS IT?

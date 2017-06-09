@@ -1,4 +1,4 @@
-globals[ wall target room-floor obstacle-1 obstacle-2 obstacle-3 obstacle-4 obstacle-5 obstacle-6 obstacle-7 obstacle-8 obstacle-9 ]
+globals[ evacuated wall target room-floor obstacle-1 obstacle-2 obstacle-3 obstacle-4 obstacle-5 obstacle-6 obstacle-7 obstacle-8 obstacle-9 ]
 patches-own[ target-distance obstacle-value ]
 
 
@@ -22,14 +22,25 @@ to move_crowd
     let val 0
     let this_path_field [target-distance] of patch-here
     let moveto patch-here
+    let patch_direction NOBODY
+    if (not(patch-ahead 1 = NOBODY)) [
+        ;ifelse self = [ patch-ahead 1 ] of myself
+        ;[set direction 1000]
+        ;[set direction 0]
+      set patch_direction patch-ahead 1
+    ]
 
     ask turtle_neighbors [
+      let direction 0
+      if(self = patch_direction)[
+        set direction 0.2
+      ]
       if(not (pcolor = red))[
         if not (any? turtles-on self)
         [
           let goal ((this_path_field - target-distance)/(sqrt(2)))
           let obstacle_repulsion ( - ( obstacle-value / 5 ) )
-          let utility ((obstacle_repulsion + goal))
+          let utility ((obstacle_repulsion + goal + direction))
           let probability exp(utility)
           if(probability > val)[
             set val probability
@@ -41,6 +52,7 @@ to move_crowd
     ]
     if(pcolor = blue)[
       die
+      set evacuated (evacuated + 1)
     ]
     face moveto
     move-to moveto
@@ -274,7 +286,7 @@ n_crowd
 n_crowd
 1
 500
-1.0
+262.0
 1
 1
 NIL
@@ -296,6 +308,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+55
+290
+255
+440
+plot 1
+Exit
+Time
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Evacuated" 1.0 0 -16777216 true "" "plot evacuated"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -639,7 +669,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0
+NetLogo 6.0.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

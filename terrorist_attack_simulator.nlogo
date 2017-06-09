@@ -1,6 +1,7 @@
 globals[ wall target room-floor obstacle-1 obstacle-2 obstacle-3 obstacle-4 obstacle-5 obstacle-6 obstacle-7 obstacle-8 obstacle-9 ]
 patches-own[ target-distance obstacle-value ]
 
+
 to set-up
   clear-all
   prepare-patch
@@ -19,26 +20,23 @@ to move_crowd
   ask turtles [
     let turtle_neighbors neighbors
     let val 0
-
     let this_path_field [target-distance] of patch-here
     let moveto patch-here
 
     ask turtle_neighbors [
       if(not (pcolor = red))[
-       let overlap 0
-        if any? turtles-on myself
+        if not (any? turtles-on self)
         [
-          set overlap -10
+          let goal ((this_path_field - target-distance)/(sqrt(2)))
+          let obstacle_repulsion ( - ( obstacle-value / 5 ) )
+          let utility ((obstacle_repulsion + goal))
+          let probability exp(utility)
+          if(probability > val)[
+            set val probability
+            set moveto self
+           ]
         ]
-        let goal ((this_path_field - target-distance)/(sqrt(2)))
-        let obstacle_repulsion ( - ( obstacle-value / 3 ) )
 
-        let utility ((obstacle_repulsion + goal + overlap))
-        let probability exp(utility)
-        if(probability > val)[
-          set val probability
-          set moveto self
-        ]
       ]
     ]
     if(pcolor = blue)[
@@ -192,7 +190,13 @@ to compute-obstacle
  end
 
 to prepare-crowd
-  ask n-of n_crowd room-floor [ sprout 1 [ set color black ]]
+  ask n-of n_crowd room-floor
+  [
+    sprout 1
+    [
+      set color random 500
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -257,7 +261,7 @@ SWITCH
 238
 obstacle-label
 obstacle-label
-0
+1
 1
 -1000
 
@@ -270,7 +274,7 @@ n_crowd
 n_crowd
 1
 500
-11.0
+1.0
 1
 1
 NIL

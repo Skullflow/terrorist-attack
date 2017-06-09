@@ -18,7 +18,7 @@ end
 to move_crowd
   ask turtles [
     let turtle_neighbors neighbors
-    let val 60000
+    let val 0
 
     let this_path_field [target-distance] of patch-here
     let moveto patch-here
@@ -26,19 +26,20 @@ to move_crowd
     ask turtle_neighbors [
       if(not (pcolor = red))[
         let goal ((this_path_field - target-distance)/(sqrt(2)))
-        ;;let obstacle_repulsion ( - ( obstacle-value / 3 ) )
+        let obstacle_repulsion ( - ( obstacle-value / 3 ) )
 
-        ;;let utility ((obstacle_repulsion + goal))
-        ;;let probability exp(utility)
-        if(goal < val)[
-          set val target-distance
+        let utility ((obstacle_repulsion + goal))
+        let probability exp(utility)
+        if(probability > val)[
+          set val probability
           set moveto self
         ]
       ]
     ]
-    if(val = 0)[
+    if(pcolor = blue)[
       die
     ]
+    face moveto
     move-to moveto
   ]
 end
@@ -168,12 +169,15 @@ to compute-obstacle
     let pt self
     let ov [ obstacle-value ] of pt
     ifelse any? patches with [ pcolor = red ] in-radius 1
-    [ set ov 3]
+    [ set ov 5]
     [ ifelse any? patches with [ pcolor = red ] in-radius 2
-      [ set ov 2 ]
+      [ set ov 4 ]
       [ ifelse any? patches with [ pcolor = red ] in-radius 3
-        [ set ov 1 ]
-        [ set ov 0]
+        [ set ov 3 ]
+        [ ifelse any? patches with [ pcolor = red ] in-radius 4
+          [set ov 2]
+          [ ifelse any? patches with [ pcolor = red ] in-radius 5 [set ov 1][set ov 0]]
+        ]
       ]
     ]
     set obstacle-value ov
@@ -248,7 +252,7 @@ SWITCH
 238
 obstacle-label
 obstacle-label
-1
+0
 1
 -1000
 
@@ -261,7 +265,7 @@ n_crowd
 n_crowd
 1
 500
-1.0
+11.0
 1
 1
 NIL
